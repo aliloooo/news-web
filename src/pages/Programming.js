@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchNews } from '../services/api';
 
-const Indonesia = () => {
+const Programming = () => {
   const [news, setNews] = useState([]); // Menyimpan data berita
   const [isLoading, setIsLoading] = useState(true); // Status loading
   const [error, setError] = useState(null); // Menyimpan error
@@ -13,7 +13,7 @@ const Indonesia = () => {
         setIsLoading(true);
         setError(null);
 
-        const fetchedNews = await fetchNews('Indonesia');
+        const fetchedNews = await fetchNews('Programming');
         if (fetchedNews) {
           setNews(fetchedNews);
         } else {
@@ -37,7 +37,7 @@ const Indonesia = () => {
     if (!isAlreadySaved) {
       const updatedSaved = [...saved, newsItem];
       localStorage.setItem('savedNews', JSON.stringify(updatedSaved));
-      setShowModal(true);
+      setShowModal(true); // Tampilkan modal success
       setTimeout(() => setShowModal(false), 1000);
     } else {
       alert('Berita ini sudah ada di daftar saved!');
@@ -46,7 +46,7 @@ const Indonesia = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="text-3xl font-bold mb-6">Berita Terkini dari Indonesia</h1>
+      <h1 className="text-3xl font-bold mb-6">Berita Seputar Programming</h1>
 
       {/* Modal Success */}
       {showModal && (
@@ -116,4 +116,4 @@ const Indonesia = () => {
   );
 };
 
-export default Indonesia;
+export default Programming;
