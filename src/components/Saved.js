@@ -24,31 +24,34 @@ const Saved = () => {
       {savedNews.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {savedNews.map((item, index) => (
-            <div
-            key={item._id || item.uri}
-            className="bg-white shadow-lg rounded-lg p-4 border border-gray-200"
-          >
-            <h2 className="font-bold text-lg mb-2">
-              {item.headline?.main || 'Tidak ada judul'}
-            </h2>
-            <p className="text-gray-600 text-sm mb-4">
-              {item.snippet || 'Tidak ada deskripsi singkat'}
-            </p>
-            <div className="flex space-x-2">
+            <article
+              key={item._id || item.uri}
+              className="rounded-lg border border-gray-100 bg-white p-4 shadow-sm transition hover:shadow-lg sm:p-6"
+            >
+              <a href={item.web_url}>
+                <h3 className="mt-0.5 text-lg font-medium text-gray-900">
+                  {item.headline?.main || 'Tidak ada judul'}
+                </h3>
+              </a>
+
+              <p className="mt-2 line-clamp-3 text-sm/relaxed text-gray-500">
+                {item.snippet || 'Tidak ada deskripsi singkat'}
+              </p>
+
               <button
                 onClick={() => window.open(item.web_url, '_blank')}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg"
+                className="group mt-4 inline-flex items-center gap-1 text-sm font-medium text-blue-600"
               >
                 Baca Selengkapnya
               </button>
+
               <button
                 onClick={() => handleRemoveNews(index)}
-                className="mt-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg"
+                className="group mt-4 mx-5 inline-flex items-center gap-1 text-sm font-medium text-red-500"
               >
                 Hapus
               </button>
-            </div>
-          </div>
+            </article>
           ))}
         </div>
       ) : (
