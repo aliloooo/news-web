@@ -5,24 +5,40 @@ import { fetchNewsData } from '../store/newsSlice';
 const Indonesia = () => {
   const dispatch = useDispatch();
   const { news, isLoading, error } = useSelector((state) => state.news);
+  const [savedNews, setSavedNews] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalType, setModalType] = useState('');
 
   useEffect(() => {
     dispatch(fetchNewsData('Indonesia'));
+    const saved = JSON.parse(localStorage.getItem('savedNews')) || [];
+    setSavedNews(saved);
   }, [dispatch]);
 
-  const handleSaveNews = (newsItem) => {
-    const saved = JSON.parse(localStorage.getItem('savedNews')) || [];
-    const isAlreadySaved = saved.some((item) => item._id === newsItem._id);
+  const handleSaveToggle = (newsItem) => {
+    const isAlreadySaved = savedNews.some((item) => item._id === newsItem._id);
 
-    if (!isAlreadySaved) {
-      const updatedSaved = [...saved, newsItem];
+    if (isAlreadySaved) {
+      const updatedSaved = savedNews.filter((item) => item._id !== newsItem._id);
+      setSavedNews(updatedSaved);
       localStorage.setItem('savedNews', JSON.stringify(updatedSaved));
-      setShowModal(true);
-      setTimeout(() => setShowModal(false), 1000);
+      setModalMessage('Berita berhasil dihapus!');
+      setModalType('unsave');
     } else {
-      alert('Berita ini sudah ada di daftar saved!');
+      const updatedSaved = [...savedNews, newsItem];
+      setSavedNews(updatedSaved);
+      localStorage.setItem('savedNews', JSON.stringify(updatedSaved));
+      setModalMessage('Berita berhasil disimpan!');
+      setModalType('save');
     }
+
+    setShowModal(true);
+    setTimeout(() => setShowModal(false), 1000);
+  };
+
+  const isNewsSaved = (newsItem) => {
+    return savedNews.some((item) => item._id === newsItem._id);
   };
 
   return (
@@ -32,8 +48,14 @@ const Indonesia = () => {
       {showModal && (
         <div className="fixed inset-0 flex justify-center items-center bg-gray-600 bg-opacity-50 z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-            <h2 className="text-xl font-semibold text-emerald-500">Success</h2>
-            <p className="text-sm text-gray-600 mt-2">Berita berhasil disimpan!</p>
+            <h2
+              className={`text-xl font-semibold ${
+                modalType === 'save' ? 'text-emerald-500' : 'text-red-500'
+              }`}
+            >
+              {modalType === 'save' ? 'Saved' : 'Deleted'}
+            </h2>
+            <p className="text-sm text-gray-600 mt-2">{modalMessage}</p>
             <div className="mt-4 flex justify-end">
               <button
                 onClick={() => setShowModal(false)}
@@ -72,17 +94,14 @@ const Indonesia = () => {
                 className="group mt-4 inline-flex items-center gap-1 text-sm font-medium text-blue-600"
               >
                 Baca Selengkapnya
-                <span
-                  aria-hidden="true"
-                  className="block transition-all group-hover:ms-0.5 rtl:rotate-180"
-                >
-                </span>
               </a>
               <button
-                onClick={() => handleSaveNews(item)}
-                className="group mt-4 mx-5 inline-flex items-center gap-1 text-sm font-medium text-green-600"
+                onClick={() => handleSaveToggle(item)}
+                className={`group mt-4 mx-5 inline-flex items-center gap-1 text-sm font-medium ${
+                  isNewsSaved(item) ? 'text-red-600' : 'text-green-600'
+                }`}
               >
-                Save
+                {isNewsSaved(item) ? 'Unsave' : 'Save'}
               </button>
             </article>
           ))}
