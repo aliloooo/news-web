@@ -1,34 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { fetchNews } from '../services/api';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchNewsData } from '../store/newsSlice';
 
 const Programming = () => {
-  const [news, setNews] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const { news, isLoading, error } = useSelector((state) => state.news);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    const getNews = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const fetchedNews = await fetchNews('Programming');
-        if (fetchedNews) {
-          setNews(fetchedNews);
-        } else {
-          setError('Tidak ada data berita yang tersedia.');
-        }
-      } catch (err) {
-        setError('Gagal memuat berita. Silakan coba lagi.');
-        console.error('Error fetching news:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getNews();
-  }, []);
+    dispatch(fetchNewsData('Programming'));
+  }, [dispatch]);
 
   const handleSaveNews = (newsItem) => {
     const saved = JSON.parse(localStorage.getItem('savedNews')) || [];
@@ -76,23 +57,27 @@ const Programming = () => {
               key={item._id || item.uri}
               className="rounded-lg border border-gray-100 bg-white p-4 shadow-sm transition hover:shadow-lg sm:p-6"
             >
-              <a href={item.web_url}>
+              <a href={item.web_url} target="_blank" rel="noopener noreferrer">
                 <h3 className="mt-0.5 text-lg font-medium text-gray-900">
                   {item.headline?.main || 'Tidak ada judul'}
                 </h3>
               </a>
-
               <p className="mt-2 line-clamp-3 text-sm/relaxed text-gray-500">
                 {item.snippet || 'Tidak ada deskripsi singkat'}
               </p>
-
-              <button
-                onClick={() => window.open(item.web_url, '_blank')}
+              <a
+                href={item.web_url}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="group mt-4 inline-flex items-center gap-1 text-sm font-medium text-blue-600"
               >
                 Baca Selengkapnya
-              </button>
-
+                <span
+                  aria-hidden="true"
+                  className="block transition-all group-hover:ms-0.5 rtl:rotate-180"
+                >
+                </span>
+              </a>
               <button
                 onClick={() => handleSaveNews(item)}
                 className="group mt-4 mx-5 inline-flex items-center gap-1 text-sm font-medium text-green-600"
