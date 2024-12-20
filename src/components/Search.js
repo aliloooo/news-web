@@ -10,7 +10,10 @@ const Search = () => {
   const query = useQuery().get('query');
   const [news, setNews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [savedNews, setSavedNews] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalType, setModalType] = useState(''); // 'save' or 'unsave'
 
   useEffect(() => {
     const searchNews = async () => {
@@ -22,31 +25,56 @@ const Search = () => {
       }
     };
     searchNews();
+
+    // Fetch saved news from localStorage
+    const saved = JSON.parse(localStorage.getItem('savedNews')) || [];
+    setSavedNews(saved);
   }, [query]);
 
-  const handleSaveNews = (newsItem) => {
-    const saved = JSON.parse(localStorage.getItem('savedNews')) || [];
-    const isAlreadySaved = saved.some((item) => item._id === newsItem._id);
+  const handleSaveToggle = (newsItem) => {
+    const isAlreadySaved = savedNews.some((item) => item._id === newsItem._id);
 
-    if (!isAlreadySaved) {
-      const updatedSaved = [...saved, newsItem];
+    if (isAlreadySaved) {
+      // Remove the news item from saved
+      const updatedSaved = savedNews.filter((item) => item._id !== newsItem._id);
+      setSavedNews(updatedSaved);
       localStorage.setItem('savedNews', JSON.stringify(updatedSaved));
-      setShowModal(true);
-      setTimeout(() => setShowModal(false), 1000);
+      setModalMessage('Berita berhasil dihapus dari daftar saved!');
+      setModalType('unsave');
     } else {
-      alert('Berita ini sudah ada di daftar saved!');
+      // Add the news item to saved
+      const updatedSaved = [...savedNews, newsItem];
+      setSavedNews(updatedSaved);
+      localStorage.setItem('savedNews', JSON.stringify(updatedSaved));
+      setModalMessage('Berita berhasil disimpan ke daftar saved!');
+      setModalType('save');
     }
+
+    // Show modal
+    setShowModal(true);
+    setTimeout(() => setShowModal(false), 1000); // Auto-close after 1 second
+  };
+
+  const isNewsSaved = (newsItem) => {
+    return savedNews.some((item) => item._id === newsItem._id);
   };
 
   return (
     <div className="container mx-auto px-4 py-6">
       <h1 className="text-3xl font-bold mb-6">Hasil Pencarian: "{query}"</h1>
 
+      {/* Modal Alert */}
       {showModal && (
         <div className="fixed inset-0 flex justify-center items-center bg-gray-600 bg-opacity-50 z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-            <h2 className="text-xl font-semibold text-emerald-500">Success</h2>
-            <p className="text-sm text-gray-600 mt-2">Berita berhasil disimpan!</p>
+            <h2
+              className={`text-xl font-semibold ${
+                modalType === 'save' ? 'text-emerald-500' : 'text-red-500'
+              }`}
+            >
+              {modalType === 'save' ? 'Saved' : 'Deleted'}
+            </h2>
+            <p className="text-sm text-gray-600 mt-2">{modalMessage}</p>
             <div className="mt-4 flex justify-end">
               <button
                 onClick={() => setShowModal(false)}
@@ -79,10 +107,12 @@ const Search = () => {
                 Baca Selengkapnya
               </a>
               <button
-                onClick={() => handleSaveNews(item)}
-                className="mt-3 mx-5 text-green-500 hover:underline"
+                onClick={() => handleSaveToggle(item)}
+                className={`mt-3 mx-5 ${
+                  isNewsSaved(item) ? 'text-red-500' : 'text-green-500'
+                } hover:underline`}
               >
-                Save
+                {isNewsSaved(item) ? 'Unsave' : 'Save'}
               </button>
             </li>
           ))}
