@@ -11,7 +11,7 @@ const Programming = () => {
   const [modalType, setModalType] = useState('');
 
   useEffect(() => {
-    dispatch(fetchNewsData('Indonesia'));
+    dispatch(fetchNewsData('Programming'));
     const saved = JSON.parse(localStorage.getItem('savedNews')) || [];
     setSavedNews(saved);
   }, [dispatch]);
