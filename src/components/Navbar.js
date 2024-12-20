@@ -18,7 +18,7 @@ const Navbar = () => {
       <div className="container px-6 py-3 mx-auto md:flex">
         <div className="flex items-center justify-between">
           <a href="/">
-            <img className="w-auto h-6 sm:h-7" src="" alt="News App" />
+            <img className="h-8 max-h-10 w-auto sm:h-9" src="/logonews.png" alt="News App" />
           </a>
 
           <div className="flex lg:hidden">

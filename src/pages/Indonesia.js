@@ -43,7 +43,7 @@ const Indonesia = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="text-3xl font-bold mb-6">Berita Terkini dari Indonesia</h1>
+      <h1 className="text-3xl font-bold mb-6">Berita dari Indonesia</h1>
 
       {showModal && (
         <div className="fixed inset-0 flex justify-center items-center bg-gray-600 bg-opacity-50 z-50">
