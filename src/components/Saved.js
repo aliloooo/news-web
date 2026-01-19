@@ -1,81 +1,55 @@
 import React, { useState, useEffect } from 'react';
+import NewsCard from '../components/NewsCard';
+import NewsGrid from '../components/NewsGrid';
+import Toast from '../components/Toast';
 
 const Saved = () => {
   const [savedNews, setSavedNews] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  const [toast, setToast] = useState({ message: '', type: '' });
 
-  
   useEffect(() => {
     const storedNews = JSON.parse(localStorage.getItem('savedNews')) || [];
     setSavedNews(storedNews);
   }, []);
 
-  const handleRemoveNews = (index) => {
-    const updatedNews = [...savedNews];
-    updatedNews.splice(index, 1);
+  const handleSaveToggle = (newsItem) => {
+    // In Saved page, toggling always means removing
+    const updatedNews = savedNews.filter((item) => item._id !== newsItem._id);
     setSavedNews(updatedNews);
     localStorage.setItem('savedNews', JSON.stringify(updatedNews));
-
-    setShowModal(true);
-    setTimeout(() => setShowModal(false), 1000);
+    setToast({ message: 'Article removed from Saved', type: 'unsave' });
   };
 
-  return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-3xl font-bold mb-6">Berita yang Disimpan</h1>
+  const handleCloseToast = () => setToast({ message: '', type: '' });
 
-      {showModal && (
-        <div className="fixed inset-0 flex justify-center items-center bg-gray-600 bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-            <h2 className="text-xl font-semibold text-red-500">Deleted</h2>
-            <p className="text-sm text-gray-600 mt-2">Berita berhasil dihapus!</p>
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={() => setShowModal(false)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+  return (
+    <div>
+      <div className="mb-8 border-b border-gray-200 pb-5">
+        <h1 className="text-3xl font-bold text-gray-900">Saved Articles</h1>
+        <p className="mt-2 text-gray-500">Your collection of bookmarked news</p>
+      </div>
+
+      <Toast message={toast.message} type={toast.type} onClose={handleCloseToast} />
 
       {savedNews.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {savedNews.map((item, index) => (
-            <article
+        <NewsGrid>
+          {savedNews.map((item) => (
+            <NewsCard
               key={item._id || item.uri}
-              className="rounded-lg border border-gray-100 bg-white p-4 shadow-sm transition hover:shadow-lg sm:p-6"
-            >
-              <a href={item.web_url}>
-                <h3 className="mt-0.5 text-lg font-medium text-gray-900">
-                  {item.headline?.main || 'Tidak ada judul'}
-                </h3>
-              </a>
-
-              <p className="mt-2 line-clamp-3 text-sm/relaxed text-gray-500">
-                {item.snippet || 'Tidak ada deskripsi singkat'}
-              </p>
-
-              <button
-                onClick={() => window.open(item.web_url, '_blank')}
-                className="group mt-4 inline-flex items-center gap-1 text-sm font-medium text-blue-600"
-              >
-                Baca Selengkapnya
-              </button>
-
-              <button
-                onClick={() => handleRemoveNews(index)}
-                className="group mt-4 mx-5 inline-flex items-center gap-1 text-sm font-medium text-red-500"
-              >
-                Hapus
-              </button>
-            </article>
+              article={item}
+              isSaved={true}
+              onToggleSave={handleSaveToggle}
+            />
           ))}
-        </div>
+        </NewsGrid>
       ) : (
-        <p className="text-gray-600">Tidak ada berita yang disimpan.</p>
+        <div className="text-center py-20 bg-white rounded-xl border border-dashed border-gray-300">
+          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">No saved articles</h3>
+          <p className="mt-1 text-sm text-gray-500">Start reading and bookmark news to see them here.</p>
+        </div>
       )}
     </div>
   );
