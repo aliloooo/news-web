@@ -5,6 +5,7 @@ import NewsCard from '../components/NewsCard';
 import NewsGrid from '../components/NewsGrid';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import Toast from '../components/Toast';
+import { themes } from '../utils/theme';
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -59,18 +60,20 @@ const Search = () => {
 
   const handleCloseToast = () => setToast({ message: '', type: '' });
 
+  const theme = themes.default; // Use default retro theme for Search
+
   return (
-    <div>
-      <div className="mb-8 border-b border-gray-200 pb-5">
-        <h1 className="text-3xl font-bold text-gray-900">Search Results</h1>
-        <p className="mt-2 text-gray-500">Showing results for "{query}"</p>
+    <div className="min-h-screen">
+      <div className="mb-8 border-b-4 border-vintage-ink pb-5">
+        <h1 className="text-5xl font-black uppercase tracking-tighter text-vintage-ink">Search Results</h1>
+        <p className="mt-2 font-serif italic text-lg text-vintage-ink opacity-75">Showing results for "{query}"</p>
       </div>
 
       <Toast message={toast.message} type={toast.type} onClose={handleCloseToast} />
 
       {isLoading ? (
         <NewsGrid>
-          {[...Array(6)].map((_, i) => <LoadingSkeleton key={i} />)}
+          {[...Array(6)].map((_, i) => <LoadingSkeleton key={i} theme={theme} />)}
         </NewsGrid>
       ) : news.length > 0 ? (
         <NewsGrid>
@@ -80,12 +83,13 @@ const Search = () => {
               article={item}
               isSaved={isNewsSaved(item)}
               onToggleSave={handleSaveToggle}
+              theme={theme}
             />
           ))}
         </NewsGrid>
       ) : (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">No news found for "{query}".</p>
+        <div className="text-center py-12 border-2 border-dashed border-vintage-ink bg-white">
+          <p className="text-xl font-serif italic">Extra! Extra! No news found for "{query}".</p>
         </div>
       )}
     </div>
